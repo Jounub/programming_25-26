@@ -40,8 +40,7 @@ public class MyController {
                 .errorMessage("")
                 .build();
         try{
-            validationService.isValid(bindingResult);
-            validationService.validateFields(request);
+            validationService.isValid(bindingResult, request);
         } catch (ValidationFailedException | UnsupportedCodeException e){
             response.setCode("failed");
             response.setErrorCode(e.getMessage());

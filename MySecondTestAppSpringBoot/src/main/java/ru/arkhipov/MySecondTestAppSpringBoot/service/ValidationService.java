@@ -8,6 +8,5 @@ import ru.arkhipov.MySecondTestAppSpringBoot.model.Request;
 
 @Service
 public interface ValidationService {
-    void isValid(BindingResult bindingResult) throws ValidationFailedException;
-    void validateFields(Request request) throws ValidationFailedException, UnsupportedCodeException;
+    void isValid(BindingResult bindingResult, Request request) throws ValidationFailedException, UnsupportedCodeException;
 }
