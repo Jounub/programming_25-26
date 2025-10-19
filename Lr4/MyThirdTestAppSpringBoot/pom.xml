@@ -9,7 +9,7 @@
 		<relativePath/> <!-- lookup parent from repository -->
 	</parent>
 	<groupId>ru.arkhipov</groupId>
-	<artifactId>MySecondTestAppSpringBoot</artifactId>
+	<artifactId>MyThirdTestAppSpringBoot</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
 	<name>MySecondTestAppSpringBoot</name>
 	<description>Demo project for Spring Boot</description>

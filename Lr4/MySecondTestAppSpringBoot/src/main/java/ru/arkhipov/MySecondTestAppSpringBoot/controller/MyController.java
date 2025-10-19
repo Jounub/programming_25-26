@@ -18,34 +18,39 @@ import ru.arkhipov.MySecondTestAppSpringBoot.service.ModifyResponseService;
 import ru.arkhipov.MySecondTestAppSpringBoot.service.ValidationService;
 import ru.arkhipov.MySecondTestAppSpringBoot.util.DateTimeUtil;
 
-import java.text.SimpleDateFormat;
 import java.util.Date;
-import java.util.List;
 
 @Slf4j
 @RestController
 public class MyController {
     private final ValidationService validationService;
     private final ModifyResponseService modifyResponseService;
-    private final List<ModifyRequestService> modifyRequestServices;
+    private final ModifyRequestService modifySystemTimeRequestService;
+    private final ModifyRequestService modifySystemNameRequestService;
+    private final ModifyRequestService modifySourceRequestService;
 
     @Autowired
     public MyController(ValidationService validationService,
                         @Qualifier("ModifySystemTimeResponseService") ModifyResponseService modifyResponseService,
-                        List<ModifyRequestService> modifyRequestService){
+                        @Qualifier("ModifySystemTimeRequestService") ModifyRequestService modifySystemTimeRequestService,
+                        @Qualifier("ModifySystemNameRequestService") ModifyRequestService modifySystemNameRequestService,
+                        @Qualifier("ModifySourceRequestService") ModifyRequestService modifySourceRequestService){
         this.validationService = validationService;
         this.modifyResponseService = modifyResponseService;
-        this.modifyRequestServices = modifyRequestService;
+        this.modifySystemTimeRequestService = modifySystemTimeRequestService;
+        this.modifySystemNameRequestService = modifySystemNameRequestService;
+        this.modifySourceRequestService = modifySourceRequestService;
     }
     @PostMapping(value = "/feedback")
     public ResponseEntity<Response> feedback(@Valid @RequestBody Request request,
                                              BindingResult bindingResult){
+        modifySystemTimeRequestService.modify(request);
         log.info("request: {}", request);
 
         Response response = Response.builder()
                 .uid(request.getUid())
                 .operationUid(request.getOperationUid())
-                .systemName("")
+                .systemName(request.getSystemName())
                 .systemTime(DateTimeUtil.getCustomFormat().format(new Date()))
                 .code(Codes.SUCCESS)
                 .errorCode(ErrorCodes.EMPTY)
@@ -72,9 +77,8 @@ public class MyController {
         }
 
         modifyResponseService.modify(response);
-        for(ModifyRequestService modifyRequestService : modifyRequestServices){
-            modifyRequestService.modify(request);
-        }
+        modifySourceRequestService.modify(request);
+        modifySystemNameRequestService.modify(request);
 
         return new ResponseEntity<>(modifyResponseService.modify(response), HttpStatus.OK);
     }
