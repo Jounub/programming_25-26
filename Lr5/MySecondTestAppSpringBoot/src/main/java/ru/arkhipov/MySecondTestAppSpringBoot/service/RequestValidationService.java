@@ -15,7 +15,7 @@ public class RequestValidationService implements ValidationService{
     public void isValid(BindingResult bindingResult, Request request) throws ValidationFailedException, UnsupportedCodeException{
         if(bindingResult.hasErrors()){
             FieldError error = bindingResult.getFieldError();
-            String errorMessage = String.format("%s %s", error.getField(), error.getDefaultMessage());
+            String errorMessage = String.format("%s", error.getDefaultMessage());
             throw new
                     ValidationFailedException(errorMessage);
         }
@@ -25,4 +25,3 @@ public class RequestValidationService implements ValidationService{
         }
     }
 }
-//Добавьте валидацию полей в соответствии с п 1.1 в таблице с описанием request, колонка обязательность.

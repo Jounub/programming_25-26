@@ -45,7 +45,7 @@ public class MyController {
         Response response = Response.builder()
                 .uid(request.getUid())
                 .operationUid(request.getOperationUid())
-                .systemName("")
+                .systemName(request.getSystemName())
                 .systemTime(DateTimeUtil.getCustomFormat().format(new Date()))
                 .code(Codes.SUCCESS)
                 .errorCode(ErrorCodes.EMPTY)

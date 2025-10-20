@@ -12,12 +12,12 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 public class Request {
 
-    //Уникальный идентификатор сообщение
-    @NotBlank
+    //Уникальный идентификатор сообщения
+    @NotBlank(message = "UID не может быть пустым")
     private String uid;
 
     //Уникальный идентификатор операции
-    @NotBlank
+    @NotBlank(message = "Operation UID не может быть пустым")
     private String operationUid;
 
     //Имя системы отправителя
@@ -36,9 +36,9 @@ public class Request {
     private Double bonus;
     //Количество рабочих дней
     private Integer workDays;
-    //Уникальный идентификатор коммуникации
+    //Идентификатор коммуникации
     private int communicationId;
-    //Уникальный идентификатор шаблона
+    //Идентификатор шаблона
     private int templateId;
     //Код продукта
     private int productCode;
