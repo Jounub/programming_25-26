@@ -9,9 +9,8 @@ import lombok.NoArgsConstructor;
 @Entity
 @NoArgsConstructor
 @AllArgsConstructor
-@Table(name = "STUDENTS")
-public class Student {
-
+@Table(name = "DISCIPLINES")
+public class Discipline {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int id;
@@ -19,12 +18,24 @@ public class Student {
     @Column(name = "name")
     private String name;
 
-    @Column(name = "surname")
-    private String surname;
+    @Column(name = "teacher")
+    private String teacher;
 
     @Column(name = "faculty")
     private String faculty;
 
-    @Column(name = "age")
-    private Integer age;
+    @Column(name = "hours")
+    private Integer hours;
+
+    @Column(name = "semester")
+    private Integer semester;
+
+    @Enumerated(EnumType.STRING)
+    @Column(name = "control_type")
+    private ControlType controlType;
+
+    public enum ControlType{
+        pass,
+        exam
+    }
 }
