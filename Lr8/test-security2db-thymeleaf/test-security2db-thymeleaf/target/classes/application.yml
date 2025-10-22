@@ -1,0 +1,13 @@
+spring:
+  main:
+    allow-circular-references: true
+  application:
+    name: test-security2db-thymeleaf
+  datasource:
+    url: jdbc:h2:C:\Users\obita\IdeaProjects\programming_25-26\Lr8\test-security2db-thymeleaf\test-security2db-thymeleaf\testdb\students
+  jpa:
+    hibernate:
+      ddl-auto: update
+    show-sql: true
+  h2:
+    console.enabled: true
