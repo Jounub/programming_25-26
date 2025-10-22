@@ -1,0 +1,11 @@
+spring:
+  application:
+    name: MyIURestDbService
+  datasource:
+    url: jdbc:h2:C:\Users\obita\IdeaProjects\programming_25-26\Lr7\MyIURestDbService\MyIURestDbService\testdb\students
+  jpa:
+    hibernate:
+      ddl-auto: update
+    open-in-view: false
+  h2:
+    console.enabled: true
