@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layout}">
+<head>
+    <title>Главная</title>
+</head>
+<body>
+<div layout:fragment="content">
+    <h1>Добро пожаловать в Центр обработки документов</h1>
+    <div class="alert alert-info">
+        <p>Вы вошли как: <strong th:text="${username}"></strong></p>
+        <p>Роли: <span th:text="${roles}"></span></p>
+    </div>
+
+    <div class="row">
+        <div class="col-md-4">
+            <div class="card">
+                <div class="card-body">
+                    <h5 class="card-title">Управление клиентами</h5>
+                    <p class="card-text">Добавление, редактирование и просмотр информации о клиентах.</p>
+                    <a th:href="@{/clients/list}" class="btn btn-primary">Перейти</a>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card">
+                <div class="card-body">
+                    <h5 class="card-title">Расчет услуг</h5>
+                    <p class="card-text">Расчет стоимости услуг и дополнительных сервисов.</p>
+                    <a th:href="@{/calculation}" class="btn btn-primary">Перейти</a>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card">
+                <div class="card-body">
+                    <h5 class="card-title">О приложении</h5>
+                    <p class="card-text">Информация о разработчике и возможностях приложения.</p>
+                    <a th:href="@{/about}" class="btn btn-primary">Перейти</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+</body>
+</html>
