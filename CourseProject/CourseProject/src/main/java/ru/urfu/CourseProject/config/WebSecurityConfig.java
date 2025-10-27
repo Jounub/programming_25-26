@@ -25,13 +25,14 @@ public class WebSecurityConfig {
                         .requestMatchers("/clients/list")
                                 .hasAnyRole("READ_ONLY", "USER","ADMIN", "SUPERVISOR")
 
+                        .requestMatchers("/clients/new", "/clients/create").hasAnyRole("USER","ADMIN", "SUPERVISOR")
+                        .requestMatchers("/clients/edit/**", "/clients/update/**", "/clients/delete/**")
+                            .hasAnyRole("SUPERVISOR", "ADMIN")
                         .requestMatchers("/admin/**", "/clients/**", "/users/roles").hasRole("ADMIN")
 
-                        .requestMatchers("/clients/new", "/clients/create").hasRole("USER")
                         .requestMatchers("/clients/my").hasRole("USER")
 
-                        .requestMatchers("/clients/edit/**", "/clients/update/**", "/clients/delete/**")
-                                .hasAnyRole("SUPERVISOR", "ADMIN")
+
 
                         .requestMatchers("/admin/**", "/users/**").hasRole("ADMIN")
                         .anyRequest().authenticated()
@@ -42,7 +43,7 @@ public class WebSecurityConfig {
                         .permitAll()
                 )
                 .logout(logout -> logout
-                        .logoutSuccessUrl("/")
+                        .logoutSuccessUrl("/login")
                         .permitAll()
                 )
                 .exceptionHandling(exceptions -> exceptions

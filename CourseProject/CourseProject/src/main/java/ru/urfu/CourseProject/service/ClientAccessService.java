@@ -32,13 +32,10 @@ public class ClientAccessService {
     }
 
     public boolean canEditClient(Long clientId){
-        //Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-        //String username = auth.getName();
-
         return hasRole("ROLE_ADMIN") || hasRole("ROLE_SUPERVISOR");
     }
 
-    public boolean canDeleteClients(Long clientId){
+    public boolean canDeleteClient(Long clientId){
         return hasRole("ROLE_ADMIN") || hasRole("ROLE_SUPERVISOR");
     }
 
@@ -46,17 +43,21 @@ public class ClientAccessService {
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
         String username = auth.getName();
 
-        if(hasRole("ROLE_ADMIN") || hasRole("ROLE_SUPERVISOR")){
+        if(hasRole("ROLE_ADMIN") || hasRole("ROLE_SUPERVISOR") || hasRole("ROLE_READ_ONLY")){
             return clientRepository.findAll();
         } else if(hasRole("ROLE_USER")){
             return clientRepository.findByCreatedBy(username);
-        } else return clientRepository.findAll();
+        } else return List.of();
     }
 
-    private boolean hasRole(String role){
+    public boolean hasRole(String role){
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
         return auth.getAuthorities().stream()
                 .map(GrantedAuthority::getAuthority)
                 .anyMatch(role::equals);
+    }
+
+    public String getCurrentUsername() {
+        return SecurityContextHolder.getContext().getAuthentication().getName();
     }
 }

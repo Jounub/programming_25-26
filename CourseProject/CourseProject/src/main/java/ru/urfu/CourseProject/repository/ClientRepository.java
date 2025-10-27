@@ -14,8 +14,10 @@ public interface ClientRepository extends JpaRepository<Client, Long> {
 
     //List<Client> findByPassportNumber(String passportNumber);
 
-    @Query("SELECT c FROM Client c WHERE :username IS NULL OR c.createdBy = :username")
-    List<Client> findByCreatedBy(@Param("username") String username);
+//    @Query("SELECT c FROM Client c WHERE :username IS NULL OR c.createdBy = :username")
+//    List<Client> findByCreatedBy(@Param("email") String email);
+    List<Client> findByCreatedBy(String createdBy);
+
 
     // Для поиска по статусу
     //List<Client> findByStatus(ClientStatus status);

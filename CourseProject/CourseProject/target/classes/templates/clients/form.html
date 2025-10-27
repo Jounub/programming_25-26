@@ -1,0 +1,328 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <title th:text="${isEdit ? 'Редактирование клиента' : 'Создание клиента'}"></title>
+    <link rel="stylesheet" th:href="@{/css/styles.css}">
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background: #f8f9fa;
+            padding: 40px;
+        }
+        .container {
+            max-width: 750px;
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            padding: 30px;
+            margin: auto;
+        }
+        h2 {
+            text-align: center;
+            margin-bottom: 25px;
+        }
+        label {
+            font-weight: bold;
+        }
+        input[type=text],
+        input[type=email],
+        input[type=date],
+        select,
+        textarea {
+            width: 100%;
+            padding: 8px;
+            border: 1px solid #ccc;
+            border-radius: 6px;
+            margin-bottom: 15px;
+        }
+        .checkbox-group {
+            margin-bottom: 15px;
+        }
+        .checkbox-group label {
+            display: block;
+            margin-bottom: 5px;
+        }
+        .total-box {
+            background: #f1f3f5;
+            border-radius: 8px;
+            padding: 10px 15px;
+            margin-top: 10px;
+            margin-bottom: 20px;
+            font-size: 18px;
+        }
+        button {
+            background-color: #007bff;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 6px;
+            cursor: pointer;
+        }
+        button:hover {
+            background-color: #0056b3;
+        }
+        .back-link {
+            display: inline-block;
+            margin-top: 15px;
+        }
+        .delivery-info {
+            color: #666;
+            font-size: 14px;
+            margin-top: 5px;
+        }
+        .address-section {
+            border: 1px solid #dee2e6;
+            border-radius: 8px;
+            padding: 20px;
+            margin-bottom: 20px;
+            background: #f8f9fa;
+        }
+        .address-title {
+            font-size: 18px;
+            font-weight: bold;
+            margin-bottom: 15px;
+            color: #495057;
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <h2 th:text="${isEdit ? 'Редактирование клиента' : 'Создание нового клиента'}"></h2>
+
+    <!-- Исправленная строка с form action -->
+    <form th:action="${isEdit} ? @{/clients/update/{id}(id=${client.id})} : @{/clients/create}" method="post" th:object="${client}">
+        <!-- Основные данные клиента -->
+        <label for="name">Имя:</label>
+        <input type="text" id="name" th:field="*{name}" placeholder="Введите имя" required>
+
+        <label for="surname">Фамилия:</label>
+        <input type="text" id="surname" th:field="*{surname}" placeholder="Введите фамилию" required>
+
+        <label for="passportNumber">Номер паспорта:</label>
+        <input type="text" id="passportNumber" th:field="*{passportNumber}" placeholder="Серия и номер">
+
+        <label for="birthdate">Дата рождения:</label>
+        <input type="date" id="birthdate" th:field="*{birthdate}">
+
+        <label for="email">Email:</label>
+        <input type="email" id="email" th:field="*{email}" placeholder="Введите email">
+
+        <label for="phone">Телефон:</label>
+        <input type="text" id="phone" th:field="*{phone}" placeholder="+7 (___) ___-__-__">
+
+        <!-- Поле статуса только для редактирования -->
+        <div th:if="${isEdit}">
+            <label for="status">Статус клиента:</label>
+            <select id="status" th:field="*{status}">
+                <option th:each="s : ${statuses}" th:value="${s}" th:text="${s}"></option>
+            </select>
+        </div>
+
+        <!-- Секция адреса -->
+        <div class="address-section">
+            <div class="address-title">Адрес клиента</div>
+
+            <label for="city">Город:</label>
+            <input type="text" id="city" name="city" th:value="${client.address?.city}" placeholder="Введите город" required>
+
+            <label for="street">Улица:</label>
+            <input type="text" id="street" name="street" th:value="${client.address?.street}" placeholder="Введите улицу" required>
+
+            <label for="building">Дом:</label>
+            <input type="text" id="building" name="building" th:value="${client.address?.building}" placeholder="Введите номер дома" required>
+
+            <label for="apartment">Квартира:</label>
+            <input type="text" id="apartment" name="apartment" th:value="${client.address?.apartment}" placeholder="Введите номер квартиры (необязательно)">
+        </div>
+
+        <!-- Дополнительные услуги -->
+        <div class="checkbox-group">
+            <label><input type="checkbox" id="smsNotification" name="smsNotification" th:field="*{smsNotification}"> SMS-информирование (+200₽)</label>
+            <label><input type="checkbox" id="phoneNotification" name="phoneNotification" th:field="*{phoneNotification}"> Телефонное оповещение (+250₽)</label>
+            <label><input type="checkbox" id="deliveryService" name="deliveryService" th:field="*{deliveryService}"> Доставка документов</label>
+        </div>
+
+        <div id="deliveryCityGroup" style="display: none;">
+            <label for="deliveryCity">Город доставки:</label>
+            <input type="text" id="deliveryCity" name="deliveryCity" th:field="*{deliveryCity}" placeholder="Введите город">
+            <div class="delivery-info" id="deliveryPriceInfo">Стоимость доставки: 0₽</div>
+        </div>
+
+        <label for="notes">Примечания:</label>
+        <textarea id="notes" th:field="*{notes}" rows="3" placeholder="Дополнительная информация о клиенте"></textarea>
+
+        <!-- Скрытые поля для стоимостей услуг -->
+        <input type="hidden" id="smsCostInput" name="smsCost" th:field="*{smsNotificationCost}" th:value="${client.smsNotificationCost ?: 0}">
+        <input type="hidden" id="phoneNotificationCostInput" name="phoneNotificationCost" th:field="*{phoneNotificationCost}" th:value="${client.phoneNotificationCost ?: 0}">
+        <input type="hidden" id="serviceFeeInput" name="serviceFee" th:field="*{serviceFee}" th:value="${client.serviceFee ?: 3500}">
+        <input type="hidden" id="deliveryCostInput" name="deliveryCost" th:field="*{deliveryCost}" th:value="${client.deliveryCost ?: 0}">
+        <input type="hidden" id="totalAmountInput" name="totalAmount" th:field="*{totalAmount}">
+
+        <!-- Итоговая сумма -->
+        <div class="total-box">
+            <strong>Итого: <span id="totalAmount" th:text="${#numbers.formatDecimal(client.totalAmount ?: 3500, 0, 'COMMA', 2, 'POINT')}">3,500.00</span> ₽</strong>
+            <div id="costBreakdown" style="font-size: 14px; color: #666;"></div>
+        </div>
+
+        <button type="submit" th:text="${isEdit ? 'Обновить клиента' : 'Создать клиента'}"></button>
+        <a th:href="@{/clients/list}" class="back-link">← Назад к списку</a>
+    </form>
+</div>
+
+<script>
+    const baseFee = 3500;
+    const smsCost = 200;
+    const phoneCost = 250;
+
+    const smsCheckbox = document.getElementById('smsNotification');
+    const phoneCheckbox = document.getElementById('phoneNotification');
+    const deliveryCheckbox = document.getElementById('deliveryService');
+    const deliveryCityGroup = document.getElementById('deliveryCityGroup');
+    const deliveryCityInput = document.getElementById('deliveryCity');
+    const deliveryPriceInfo = document.getElementById('deliveryPriceInfo');
+    const totalAmountEl = document.getElementById('totalAmount');
+    const totalAmountInput = document.getElementById('totalAmountInput');
+    const costBreakdownEl = document.getElementById('costBreakdown');
+
+    // Скрытые поля для стоимостей
+    const smsCostInput = document.getElementById('smsCostInput');
+    const phoneNotificationCostInput = document.getElementById('phoneNotificationCostInput');
+    const serviceFeeInput = document.getElementById('serviceFeeInput');
+    const deliveryCostInput = document.getElementById('deliveryCostInput');
+
+    // Кэш для цен доставки
+    const deliveryPriceCache = new Map();
+    let currentDeliveryPrice = 0;
+
+    // Функция для получения цены доставки с сервера
+    async function getDeliveryPrice(city) {
+        if (!city || city.trim().length < 2) {
+            return 5000; // цена по умолчанию
+        }
+
+        // Проверяем кэш
+        if (deliveryPriceCache.has(city.toLowerCase())) {
+            return deliveryPriceCache.get(city.toLowerCase());
+        }
+
+        try {
+            const response = await fetch(`/api/delivery-price?city=${encodeURIComponent(city)}`);
+            if (response.ok) {
+                const data = await response.json();
+                const price = data.price || 5000;
+                // Сохраняем в кэш
+                deliveryPriceCache.set(city.toLowerCase(), price);
+                return price;
+            }
+        } catch (error) {
+            console.error('Ошибка получения цены доставки:', error);
+        }
+
+        return 5000; // цена по умолчанию при ошибке
+    }
+
+    // Функция обновления информации о доставке
+    async function updateDeliveryPrice() {
+        const city = deliveryCityInput.value.trim();
+        if (city) {
+            const price = await getDeliveryPrice(city);
+            currentDeliveryPrice = price;
+            deliveryPriceInfo.textContent = `Стоимость доставки: ${formatCurrency(price)}`;
+        } else {
+            currentDeliveryPrice = 5000;
+            deliveryPriceInfo.textContent = 'Стоимость доставки: 5,000.00 ₽ (по умолчанию)';
+        }
+        recalcTotal();
+    }
+
+    // Функция пересчета итоговой суммы
+    function recalcTotal() {
+        let total = baseFee;
+        const breakdown = [`Сервисный сбор: ${formatCurrency(baseFee)}`];
+
+        let currentSmsCost = 0;
+        let currentPhoneCost = 0;
+        let currentDeliveryCost = 0;
+
+        if (smsCheckbox.checked) {
+            currentSmsCost = smsCost;
+            total += currentSmsCost;
+            breakdown.push(`SMS-информирование: ${formatCurrency(currentSmsCost)}`);
+        }
+
+        if (phoneCheckbox.checked) {
+            currentPhoneCost = phoneCost;
+            total += currentPhoneCost;
+            breakdown.push(`Телефонное оповещение: ${formatCurrency(currentPhoneCost)}`);
+        }
+
+        if (deliveryCheckbox.checked) {
+            currentDeliveryCost = currentDeliveryPrice;
+            total += currentDeliveryCost;
+            breakdown.push(`Доставка: ${formatCurrency(currentDeliveryCost)}`);
+        }
+
+        totalAmountEl.textContent = formatCurrency(total);
+        totalAmountInput.value = total;
+
+        // Обновляем скрытые поля с правильными стоимостями
+        smsCostInput.value = currentSmsCost;
+        phoneNotificationCostInput.value = currentPhoneCost;
+        serviceFeeInput.value = baseFee;
+        deliveryCostInput.value = currentDeliveryCost;
+
+        costBreakdownEl.innerHTML = breakdown.join('<br>');
+    }
+
+    // Функция форматирования валюты
+    function formatCurrency(amount) {
+        const number = parseFloat(amount);
+        return new Intl.NumberFormat('ru-RU', {
+            minimumFractionDigits: 2,
+            maximumFractionDigits: 2
+        }).format(number);
+    }
+
+    // Обработчики событий
+    deliveryCheckbox.addEventListener('change', () => {
+        deliveryCityGroup.style.display = deliveryCheckbox.checked ? 'block' : 'none';
+        if (deliveryCheckbox.checked) {
+            updateDeliveryPrice();
+        } else {
+            recalcTotal();
+        }
+    });
+
+    deliveryCityInput.addEventListener('input', debounce(updateDeliveryPrice, 500));
+    smsCheckbox.addEventListener('change', recalcTotal);
+    phoneCheckbox.addEventListener('change', recalcTotal);
+
+    // Функция для задержки запросов (debounce)
+    function debounce(func, wait) {
+        let timeout;
+        return function executedFunction(...args) {
+            const later = () => {
+                clearTimeout(timeout);
+                func(...args);
+            };
+            clearTimeout(timeout);
+            timeout = setTimeout(later, wait);
+        };
+    }
+
+    // Инициализация при загрузке
+    document.addEventListener('DOMContentLoaded', function() {
+        // Показываем группу доставки если услуга уже активна
+        if (deliveryCheckbox.checked) {
+            deliveryCityGroup.style.display = 'block';
+            updateDeliveryPrice();
+        }
+
+        // Начальный расчёт
+        recalcTotal();
+    });
+</script>
+
+</body>
+</html>

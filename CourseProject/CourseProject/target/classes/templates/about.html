@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layout}">
+<head>
+    <title>О приложении</title>
+</head>
+<body>
+<div layout:fragment="content">
+    <div class="row">
+        <div class="col-md-8 mx-auto">
+            <div class="card">
+                <div class="card-header bg-primary text-white">
+                    <h3 class="mb-0"><i class="fas fa-info-circle me-2"></i>О приложении</h3>
+                </div>
+                <div class="card-body">
+                    <h4>Центр обработки документов</h4>
+                    <p class="lead">Веб-приложение для управления клиентами и документами в центре обработки документов.</p>
+
+                    <h5>Основные возможности:</h5>
+                    <ul>
+                        <li>Управление клиентской базой</li>
+                        <li>Отслеживание статусов документов</li>
+                        <li>Расчет стоимости услуг</li>
+                        <li>Управление дополнительными услугами (SMS, доставка)</li>
+                        <li>Ролевая система доступа</li>
+                    </ul>
+
+                    <h5>Роли пользователей:</h5>
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="card mb-3">
+                                <div class="card-body">
+                                    <h6 class="card-title">ADMIN</h6>
+                                    <p class="card-text small">Полный доступ ко всем функциям, управление пользователями</p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="card mb-3">
+                                <div class="card-body">
+                                    <h6 class="card-title">SUPERVISOR</h6>
+                                    <p class="card-text small">Просмотр и редактирование всех клиентов</p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="card mb-3">
+                                <div class="card-body">
+                                    <h6 class="card-title">USER</h6>
+                                    <p class="card-text small">Создание новых клиентов, просмотр только своих записей</p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="card mb-3">
+                                <div class="card-body">
+                                    <h6 class="card-title">READ_ONLY</h6>
+                                    <p class="card-text small">Только просмотр информации о клиентах</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <hr>
+
+                    <h5>Информация о разработчике:</h5>
+                    <p>Приложение разработано в учебных целях с использованием Spring Boot, Spring Security, Thymeleaf и H2 Database.</p>
+
+                    <div class="mt-4">
+                        <a th:href="@{/home}" class="btn btn-primary">
+                            <i class="fas fa-home me-1"></i> На главную
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+</body>
+</html>

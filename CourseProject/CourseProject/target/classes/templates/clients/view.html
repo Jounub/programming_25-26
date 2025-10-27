@@ -1,0 +1,242 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layout}">
+<head>
+    <title>Просмотр клиента</title>
+</head>
+<body>
+<div layout:fragment="content">
+    <!-- Скрытые поля для стоимостей -->
+    <input type="hidden" id="serviceFee" th:value="${client.serviceFee ?: 3500}">
+    <input type="hidden" id="smsCost" th:value="${client.smsNotificationCost ?: 0}">
+    <input type="hidden" id="phoneNotificationCost" th:value="${client.phoneNotificationCost ?: 0}">
+    <input type="hidden" id="deliveryCost" th:value="${client.deliveryCost ?: 0}">
+    <input type="hidden" id="totalAmount" th:value="${client.totalAmount ?: 3500}">
+
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h1>Клиент: <span th:text="${client.surname + ' ' + client.name}"></span></h1>
+        <div>
+            <a th:href="@{/clients/list}" class="btn btn-outline-secondary me-2">
+                <i class="fas fa-arrow-left"></i> Назад
+            </a>
+            <th:block th:if="${canEdit}">
+                <a th:href="@{/clients/edit/{id}(id=${client.id})}" class="btn btn-warning">
+                    <i class="fas fa-edit"></i> Редактировать
+                </a>
+            </th:block>
+        </div>
+    </div>
+
+    <div class="row">
+        <!-- Основная информация -->
+        <div class="col-md-6">
+            <div class="card mb-4">
+                <div class="card-header bg-primary text-white">
+                    <h5 class="mb-0"><i class="fas fa-user me-2"></i>Основная информация</h5>
+                </div>
+                <div class="card-body">
+                    <table class="table table-borderless">
+                        <tr>
+                            <th width="40%">ФИО:</th>
+                            <td th:text="${client.surname + ' ' + client.name}"></td>
+                        </tr>
+                        <tr>
+                            <th>Паспорт:</th>
+                            <td th:text="${client.passportNumber != null} ? ${client.passportNumber} : 'Не указан'"></td>
+                        </tr>
+                        <tr>
+                            <th>Дата рождения:</th>
+                            <td th:text="${client.birthdate != null} ? ${client.birthdate} : 'Не указана'"></td>
+                        </tr>
+                        <tr>
+                            <th>Телефон:</th>
+                            <td th:text="${client.phone}"></td>
+                        </tr>
+                        <tr>
+                            <th>Email:</th>
+                            <td th:text="${client.email != null} ? ${client.email} : 'Не указан'"></td>
+                        </tr>
+                        <tr>
+                            <th>Статус:</th>
+                            <td>
+                                <span class="badge"
+                                      th:classappend="'bg-' + ${{
+                                        'ACCEPTED_FOR_PROCESSING': 'secondary',
+                                        'UNDER_REVIEW': 'warning',
+                                        'SENT_FOR_DELIVERY': 'info',
+                                        'RECEIVED_BY_CLIENT': 'success'
+                                      }[client.status.name()]}">
+                                    <span th:text="${client.status.displayName}"></span>
+                                </span>
+                            </td>
+                        </tr>
+                        <tr th:if="${client.address != null}">
+                            <th>Адрес:</th>
+                            <td>
+                                <span th:text="${client.address.city + ', ' + client.address.street + ', д.' + client.address.building}"></span>
+                                <span th:if="${client.address.apartment != null and client.address.apartment != ''}">
+                                    , кв. <span th:text="${client.address.apartment}"></span>
+                                </span>
+                            </td>
+                        </tr>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- Финансовая информация -->
+        <div class="col-md-6">
+            <div class="card mb-4">
+                <div class="card-header bg-success text-white">
+                    <h5 class="mb-0"><i class="fas fa-money-bill me-2"></i>Финансовая информация</h5>
+                </div>
+                <div class="card-body">
+                    <table class="table table-borderless">
+                        <tr>
+                            <th width="60%">Сервисный сбор:</th>
+                            <td><span id="displayServiceFee" th:text="${#numbers.formatDecimal(client.serviceFee ?: 3500, 0, 'COMMA', 2, 'POINT') + ' ₽'}"></span></td>
+                        </tr>
+                        <tr th:if="${client.smsNotification}">
+                            <th>SMS-информирование:</th>
+                            <td><span id="displaySmsCost" th:text="${#numbers.formatDecimal(client.smsNotificationCost ?: 200, 0, 'COMMA', 2, 'POINT') + ' ₽'}"></span></td>
+                        </tr>
+                        <tr th:if="${client.phoneNotification}">
+                            <th>Телефонное оповещение:</th>
+                            <td><span id="displayPhoneCost" th:text="${#numbers.formatDecimal(client.phoneNotificationCost ?: 250, 0, 'COMMA', 2, 'POINT') + ' ₽'}"></span></td>
+                        </tr>
+                        <tr th:if="${client.deliveryService}">
+                            <th>Доставка документов:</th>
+                            <td><span id="displayDeliveryCost" th:text="${#numbers.formatDecimal(client.deliveryCost ?: 0, 0, 'COMMA', 2, 'POINT') + ' ₽'}"></span></td>
+                        </tr>
+                        <tr class="table-active">
+                            <th><strong>Общая сумма:</strong></th>
+                            <td><strong id="displayTotalAmount" th:text="${#numbers.formatDecimal(client.totalAmount ?: 3500, 0, 'COMMA', 2, 'POINT') + ' ₽'}"></strong></td>
+                        </tr>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Дополнительные услуги и информация -->
+    <div class="row">
+        <div class="col-md-6">
+            <div class="card mb-4">
+                <div class="card-header bg-info text-white">
+                    <h5 class="mb-0"><i class="fas fa-concierge-bell me-2"></i>Дополнительные услуги</h5>
+                </div>
+                <div class="card-body">
+                    <div th:if="${client.smsNotification}" class="alert alert-success py-2">
+                        <i class="fas fa-check-circle me-2"></i>SMS-информирование
+                        <div class="mt-1 small">
+                            Стоимость: <strong id="smsCostBadge" th:text="${#numbers.formatDecimal(client.smsNotificationCost ?: 200, 0, 'COMMA', 2, 'POINT') + ' ₽'}"></strong>
+                        </div>
+                    </div>
+                    <div th:unless="${client.smsNotification}" class="alert alert-secondary py-2">
+                        <i class="fas fa-times-circle me-2"></i>SMS-информирование
+                    </div>
+
+                    <div th:if="${client.phoneNotification}" class="alert alert-success py-2">
+                        <i class="fas fa-check-circle me-2"></i>Телефонное оповещение
+                        <div class="mt-1 small">
+                            Стоимость: <strong id="phoneCostBadge" th:text="${#numbers.formatDecimal(client.phoneNotificationCost ?: 250, 0, 'COMMA', 2, 'POINT') + ' ₽'}"></strong>
+                        </div>
+                    </div>
+                    <div th:unless="${client.phoneNotification}" class="alert alert-secondary py-2">
+                        <i class="fas fa-times-circle me-2"></i>Телефонное оповещение
+                    </div>
+
+                    <div th:if="${client.deliveryService}" class="alert alert-success py-2">
+                        <i class="fas fa-check-circle me-2"></i>Доставка документов
+                        <div class="mt-1 small">
+                            Город: <strong th:text="${client.deliveryCity}"></strong>
+                        </div>
+                        <div class="mt-1 small">
+                            Стоимость: <strong id="deliveryCostBadge" th:text="${#numbers.formatDecimal(client.deliveryCost ?: 0, 0, 'COMMA', 2, 'POINT') + ' ₽'}"></strong>
+                        </div>
+                    </div>
+                    <div th:unless="${client.deliveryService}" class="alert alert-secondary py-2">
+                        <i class="fas fa-times-circle me-2"></i>Доставка документов
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-6">
+            <div class="card mb-4">
+                <div class="card-header bg-secondary text-white">
+                    <h5 class="mb-0"><i class="fas fa-info-circle me-2"></i>Системная информация</h5>
+                </div>
+                <div class="card-body">
+                    <table class="table table-borderless">
+                        <tr>
+                            <th width="40%">Создал:</th>
+                            <td th:text="${client.createdBy}"></td>
+                        </tr>
+                        <tr>
+                            <th>Дата создания:</th>
+                            <td th:text="${#temporals.format(client.createdDate, 'dd.MM.yyyy HH:mm')}"></td>
+                        </tr>
+                        <tr>
+                            <th>Последнее обновление:</th>
+                            <td th:text="${#temporals.format(client.lastUpdated, 'dd.MM.yyyy HH:mm')}"></td>
+                        </tr>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Примечания -->
+    <div th:if="${client.notes}" class="card">
+        <div class="card-header bg-warning">
+            <h5 class="mb-0"><i class="fas fa-sticky-note me-2"></i>Примечания</h5>
+        </div>
+        <div class="card-body">
+            <p th:text="${client.notes}" class="mb-0"></p>
+        </div>
+    </div>
+</div>
+
+<!-- Подключаем Font Awesome -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/js/all.min.js"></script>
+
+<script>
+    // Функция для обновления отображения стоимостей
+    function updateCostDisplay() {
+        const serviceFee = document.getElementById('serviceFee').value || 3500;
+        const smsCost = document.getElementById('smsCost').value || 0;
+        const phoneCost = document.getElementById('phoneNotificationCost').value || 0;
+        const deliveryCost = document.getElementById('deliveryCost').value || 0;
+        const totalAmount = document.getElementById('totalAmount').value || 3500;
+
+        // Обновляем отображение в финансовой таблице
+        document.getElementById('displayServiceFee').textContent = formatCurrency(serviceFee);
+        document.getElementById('displaySmsCost').textContent = formatCurrency(smsCost);
+        document.getElementById('displayPhoneCost').textContent = formatCurrency(phoneCost);
+        document.getElementById('displayDeliveryCost').textContent = formatCurrency(deliveryCost);
+        document.getElementById('displayTotalAmount').textContent = formatCurrency(totalAmount);
+
+        // Обновляем отображение в бейджах услуг
+        document.getElementById('smsCostBadge').textContent = formatCurrency(smsCost);
+        document.getElementById('phoneCostBadge').textContent = formatCurrency(phoneCost);
+        document.getElementById('deliveryCostBadge').textContent = formatCurrency(deliveryCost);
+    }
+
+    // Функция форматирования валюты
+    function formatCurrency(amount) {
+        const number = parseFloat(amount);
+        return new Intl.NumberFormat('ru-RU', {
+            minimumFractionDigits: 2,
+            maximumFractionDigits: 2
+        }).format(number) + ' ₽';
+    }
+
+    // Обновляем отображение при загрузке страницы
+    document.addEventListener('DOMContentLoaded', function() {
+        updateCostDisplay();
+    });
+</script>
+</body>
+</html>

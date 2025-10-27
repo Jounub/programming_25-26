@@ -35,7 +35,7 @@ public class Client {
 
     //Номер паспорта клиента
     @Column(name = "passport_number", unique = true)
-    private int passportNumber;
+    private String passportNumber;
 
     //Дата рождения клиента
     @Column(name = "birthdate")
@@ -49,15 +49,18 @@ public class Client {
     @Column(name = "phone")
     private String phone;
 
-//    @Column(name = "comment")
-//    private String comment;
-
     // Дополнительные услуги
     @Column(name = "sms_notification")
     private boolean smsNotification;
 
     @Column(name = "phone_notification")
     private boolean phoneNotification;
+
+    @Column(name = "notes")
+    private String notes;
+
+    @Column(name = "service_fee")
+    private Integer serviceFee = 3500;
 
     @Column(name = "delivery_service")
     private boolean deliveryService;
@@ -68,18 +71,25 @@ public class Client {
 
     // Стоимость доставки (будет рассчитываться)
     @Column(name = "delivery_cost")
-    private int deliveryCost;
+    private Integer deliveryCost = 0;
 
     // Общая сумма к оплате
     @Column(name = "total_amount")
-    private int totalAmount;
+    private Integer totalAmount = 3500;
+
+    @Column(name = "sms_notification_cost")
+    private Integer smsNotificationCost = 0;
+
+    @Column(name = "phone_notification_cost")
+    private Integer phoneNotificationCost = 0;
 
     // Пользователь, создавший запись
     @Column(name = "created_by")
     private String createdBy;
 
     // Связь с адресом
-    @OneToOne(cascade = CascadeType.ALL, mappedBy = "client")
+    @OneToOne(cascade = CascadeType.ALL)
+    @JoinColumn(name = "address_id")
     private Address address;
 
     // Дата создания и последнего обновления
