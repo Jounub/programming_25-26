@@ -1,0 +1,212 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layout}">
+        <!-- Bootstrap CSS -->
+        <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+
+        <!-- Font Awesome -->
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
+
+        <!-- Bootstrap JS -->
+        <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+<head>
+    <title>Управление статусами клиентов</title>
+    <style>
+        .status-workflow {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 2rem;
+            padding: 1rem;
+            background: #f8f9fa;
+            border-radius: 8px;
+        }
+        .status-step {
+            text-align: center;
+            flex: 1;
+            position: relative;
+        }
+        .status-step:not(:last-child)::after {
+            content: "→";
+            position: absolute;
+            right: -10px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #6c757d;
+        }
+        .status-badge {
+            display: inline-block;
+            padding: 0.5rem 1rem;
+            border-radius: 20px;
+            font-weight: bold;
+            margin-bottom: 0.5rem;
+            background: #6c757d;
+            color: white;
+        }
+        .next-status-btn {
+            min-width: 120px;
+        }
+    </style>
+</head>
+<body>
+<div layout:fragment="content">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h1><i class="fas fa-sync-alt me-2"></i>Управление статусами клиентов</h1>
+        <div>
+            <a th:href="@{/home}" class="btn btn-outline-secondary me-2">
+                <i class="fas fa-home"></i> На главную
+            </a>
+            <a th:href="@{/clients/list}" class="btn btn-outline-primary">
+                <i class="fas fa-list"></i> К списку клиентов
+            </a>
+        </div>
+    </div>
+
+    <!-- Сообщения -->
+    <div th:if="${success}" class="alert alert-success alert-dismissible fade show">
+        <span th:text="${success}"></span>
+        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+    </div>
+    <div th:if="${error}" class="alert alert-danger alert-dismissible fade show">
+        <span th:text="${error}"></span>
+        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+    </div>
+
+    <!-- Workflow статусов -->
+    <div class="card mb-4">
+        <div class="card-header">
+            <h5 class="mb-0"><i class="fas fa-project-diagram me-2"></i>Workflow обработки документов</h5>
+        </div>
+        <div class="card-body">
+            <div class="status-workflow">
+                <div class="status-step">
+                    <div class="status-badge">Принято в обработку</div>
+                    <small class="text-muted">Начальный статус</small>
+                </div>
+                <div class="status-step">
+                    <div class="status-badge">На рассмотрении</div>
+                    <small class="text-muted">Проверка документов</small>
+                </div>
+                <div class="status-step">
+                    <div class="status-badge">Возвращено в офис</div>
+                    <small class="text-muted">Документы готовы</small>
+                </div>
+                <div class="status-step">
+                    <div class="status-badge">Передано в доставку</div>
+                    <small class="text-muted">Только при заказе доставки</small>
+                </div>
+                <div class="status-step">
+                    <div class="status-badge">Получено клиентом</div>
+                    <small class="text-muted">Финальный статус</small>
+                </div>
+            </div>
+
+            <div class="alert alert-light border">
+                <i class="fas fa-info-circle me-2"></i>
+                <strong>Примечание:</strong> Для клиентов без услуги доставки статус "Возвращено в офис"
+                автоматически переходит в "Получено клиентом".
+            </div>
+        </div>
+    </div>
+
+    <!-- Список клиентов для управления статусами -->
+    <div class="card">
+        <div class="card-header">
+            <h5 class="mb-0"><i class="fas fa-users me-2"></i>Клиенты для управления статусами</h5>
+        </div>
+        <div class="card-body">
+            <div class="table-responsive">
+                <table class="table table-striped table-hover">
+                    <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>ФИО</th>
+                        <th>Телефон</th>
+                        <th>Текущий статус</th>
+                        <th>Доставка</th>
+                        <th>Следующий статус</th>
+                        <th>Действия</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <tr th:each="client : ${clients}">
+                        <td th:text="${client.id}"></td>
+                        <td>
+                            <strong th:text="${client.surname + ' ' + client.name}"></strong>
+                            <br><small class="text-muted" th:text="${client.createdBy}"></small>
+                        </td>
+                        <td th:text="${client.phone}"></td>
+                        <td>
+                            <span class="badge bg-secondary">
+                                <span th:text="${client.status.displayName}"></span>
+                            </span>
+                        </td>
+                        <td>
+                            <span th:if="${client.deliveryService}" class="badge bg-secondary">
+                                <i class="fas fa-truck"></i> Да
+                            </span>
+                            <span th:unless="${client.deliveryService}" class="badge bg-secondary">
+                                <i class="fas fa-times"></i> Нет
+                            </span>
+                        </td>
+                        <td>
+                            <th:block th:switch="${client.status}">
+                                <th:block th:case="${T(ru.urfu.CourseProject.model.ClientStatus).ACCEPTED_FOR_PROCESSING}">
+                                    <span class="badge bg-secondary">На рассмотрении</span>
+                                </th:block>
+                                <th:block th:case="${T(ru.urfu.CourseProject.model.ClientStatus).UNDER_REVIEW}">
+                                    <span class="badge bg-secondary">Возвращено в офис</span>
+                                </th:block>
+                                <th:block th:case="${T(ru.urfu.CourseProject.model.ClientStatus).RETURNED_TO_OFFICE}">
+            <span class="badge bg-secondary"
+                  th:text="${client.deliveryService ? 'Передано в доставку' : 'Получено клиентом'}">
+            </span>
+                                </th:block>
+                                <th:block th:case="${T(ru.urfu.CourseProject.model.ClientStatus).SENT_FOR_DELIVERY}">
+                                    <span class="badge bg-secondary">Получено клиентом</span>
+                                </th:block>
+                                <th:block th:case="${T(ru.urfu.CourseProject.model.ClientStatus).RECEIVED_BY_CLIENT}">
+                                    <span class="text-muted">Завершено</span>
+                                </th:block>
+                                <th:block th:case="*">
+                                    <span class="badge bg-secondary">Неизвестно</span>
+                                </th:block>
+                            </th:block>
+                        </td>
+                        <td>
+                            <div class="btn-group btn-group-sm">
+                                <!-- Кнопка быстрого перехода к следующему статусу -->
+                                <form th:if="${client.status != T(ru.urfu.CourseProject.model.ClientStatus).RECEIVED_BY_CLIENT}"
+                                      th:action="@{/status-management/next-status/{id}(id=${client.id})}"
+                                      method="post" class="d-inline">
+                                    <button type="submit" class="btn btn-success next-status-btn">
+                                        <i class="fas fa-arrow-right"></i> Далее
+                                    </button>
+                                </form>
+
+                                <!-- Ссылка на просмотр клиента -->
+                                <a th:href="@{/clients/view/{id}(id=${client.id})}"
+                                   class="btn btn-outline-info btn-sm ms-1" title="Просмотр">
+                                    <i class="fas fa-eye"></i>
+                                </a>
+                            </div>
+                        </td>
+                    </tr>
+                    <tr th:if="${#lists.isEmpty(clients)}">
+                        <td colspan="7" class="text-center text-muted py-4">
+                            <i class="fas fa-check-circle fa-2x mb-2"></i><br>
+                            Все клиенты имеют конечный статус<br>
+                            <small>Нет клиентов для управления статусами</small>
+                        </td>
+                    </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Подключаем Bootstrap JS для работы dropdown -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

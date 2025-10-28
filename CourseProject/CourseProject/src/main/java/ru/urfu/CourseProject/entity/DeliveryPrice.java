@@ -1,7 +1,6 @@
 package ru.urfu.CourseProject.entity;
 
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 

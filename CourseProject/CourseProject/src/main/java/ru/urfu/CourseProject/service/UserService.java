@@ -2,6 +2,8 @@ package ru.urfu.CourseProject.service;
 
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import ru.urfu.CourseProject.entity.Role;
@@ -9,10 +11,8 @@ import ru.urfu.CourseProject.entity.User;
 import ru.urfu.CourseProject.repository.RoleRepository;
 import ru.urfu.CourseProject.repository.UserRepository;
 
-import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
-import java.util.Set;
 
 @Service
 @RequiredArgsConstructor
@@ -34,22 +34,15 @@ public class UserService {
     }
 
     @Transactional
-    public void updateUserRoles(String username, List<Integer> roleIds) {
+    public void updateUserRoles(String username, List<Role> roles) {
         User user = userRepository.findByName(username);
+        user.setRoles(roles);
+
         if(user == null){
             throw new RuntimeException("Пользователь не найден");
         }
 
-
-//        Set<Role> roles = new HashSet<>();
-//        for (Integer roleId : roleIds) {
-//            Role role = roleRepository.findByName(roleId)
-//                    .orElseThrow(() -> new RuntimeException("Роль не найдена"));
-//            roles.add(role);
-//        }
-//
-//        user.setRoles(roles);
-//        userRepository.save(user);
+        userRepository.save(user);
     }
 
     @Transactional
@@ -59,13 +52,23 @@ public class UserService {
         }
 
         user.setPassword(passwordEncoder.encode(password));
-        //user.setEnabled(true);
 
-        // По умолчанию назначаем роль READ_ONLY
-//        Role readOnlyRole = roleRepository.findByName("ROLE_READ_ONLY")
-//                .orElseThrow(() -> new RuntimeException("Роль READ_ONLY не найдена"));
-
-        //user.setRoles(Set.of(readOnlyRole));
         userRepository.save(user);
+    }
+
+    public void deleteUser(Long id) {
+        Optional<User> user = userRepository.findById(id);
+
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        String currentUsername = authentication.getName();
+        if (user.isPresent()) {
+            User foundUser = user.get();
+            String name = foundUser.getEmail();
+            if (name.equals(currentUsername)) {
+                throw new RuntimeException("Нельзя удалить собственный аккаунт");
+            }
+        }
+
+        userRepository.deleteById(id);
     }
 }

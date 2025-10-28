@@ -26,14 +26,9 @@ public class WebSecurityConfig {
                                 .hasAnyRole("READ_ONLY", "USER","ADMIN", "SUPERVISOR")
 
                         .requestMatchers("/clients/new", "/clients/create").hasAnyRole("USER","ADMIN", "SUPERVISOR")
-                        .requestMatchers("/clients/edit/**", "/clients/update/**", "/clients/delete/**")
+                        .requestMatchers("/clients/edit/**", "/clients/update/**", "/clients/delete/**", "/status-management/**")
                             .hasAnyRole("SUPERVISOR", "ADMIN")
                         .requestMatchers("/admin/**", "/clients/**", "/users/roles").hasRole("ADMIN")
-
-                        .requestMatchers("/clients/my").hasRole("USER")
-
-
-
                         .requestMatchers("/admin/**", "/users/**").hasRole("ADMIN")
                         .anyRequest().authenticated()
                 )

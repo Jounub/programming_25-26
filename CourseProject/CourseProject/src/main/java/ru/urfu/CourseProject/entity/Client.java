@@ -1,7 +1,6 @@
 package ru.urfu.CourseProject.entity;
 
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -86,6 +85,10 @@ public class Client {
     // Пользователь, создавший запись
     @Column(name = "created_by")
     private String createdBy;
+
+    //Послеедний пользователь, вносивший изменения
+    @Column(name = "updated_by")
+    private String updatedBy;
 
     // Связь с адресом
     @OneToOne(cascade = CascadeType.ALL)

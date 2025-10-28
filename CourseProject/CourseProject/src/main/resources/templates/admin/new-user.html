@@ -2,6 +2,14 @@
 <html xmlns:th="http://www.thymeleaf.org"
       xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
       layout:decorate="~{layout}">
+        <!-- Bootstrap CSS -->
+        <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+
+        <!-- Font Awesome -->
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
+
+        <!-- Bootstrap JS -->
+        <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
 <head>
     <title>Новый пользователь</title>
 </head>
@@ -20,10 +28,10 @@
                 <div class="row">
                     <div class="col-md-6">
                         <div class="mb-3">
-                            <label for="name" class="form-label">Логин *</label>
+                            <label for="name" class="form-label">Имя пользователя *</label>
                             <input type="text" class="form-control" id="name"
-                                   th:field="*{name}" required>
-                            <div class="form-text">Уникальное имя пользователя для входа в систему</div>
+                                   th:field="*{name}" required
+                                   oninput="updateEmailPreview()">
                         </div>
                     </div>
                     <div class="col-md-6">
@@ -31,15 +39,48 @@
                             <label for="password" class="form-label">Пароль *</label>
                             <input type="password" class="form-control" id="password"
                                    name="password" required>
-                            <div class="form-text">Пароль должен быть не менее 6 символов</div>
                         </div>
                     </div>
                 </div>
 
+                <div class="mb-3">
+                    <label class="form-label">Email</label>
+                    <div class="alert alert-light">
+                        <i class="fas fa-envelope me-2"></i>
+                        <strong>Email:</strong>
+                        <span id="emailPreview" class="text-muted">введите логин для предпросмотра</span>
+                    </div>
+                    <div class="form-text">Email будет автоматически сформирован в формате: имя@sbproject.ru</div>
+                </div>
+
+                <div class="mb-3">
+                    <label class="form-label">Роли пользователя *</label>
+                    <div class="card">
+                        <div class="card-body">
+                            <div th:each="role : ${allRoles}" class="form-check mb-2">
+                                <input class="form-check-input" type="checkbox"
+                                       th:id="${'role_' + role.id}"
+                                       th:value="${role.id}"
+                                       name="roleIds"
+                                       th:checked="${role.name == 'READ_ONLY'}">
+                                <label class="form-check-label" th:for="${'role_' + role.id}">
+                                    <span th:text="${role.name}"
+                                          th:classappend="|badge bg-${{
+                                            'ADMIN': 'danger',
+                                            'SUPERVISOR': 'warning',
+                                            'USER': 'primary',
+                                            'READ_ONLY': 'secondary'
+                                          }[role.name] ?: 'secondary'}|"></span>
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="form-text">Выберите одну или несколько ролей для пользователя</div>
+                </div>
+
                 <div class="alert alert-info">
                     <i class="fas fa-info-circle me-2"></i>
-                    <strong>По умолчанию</strong> новому пользователю назначается роль <span class="badge bg-secondary">READ_ONLY</span>.
-                    После создания вы можете изменить роли в панели управления пользователями.
+                    Если роли не выбраны, пользователю будет назначена роль <span class="badge bg-secondary">READ_ONLY</span> по умолчанию.
                 </div>
 
                 <div class="d-flex justify-content-between">
@@ -51,6 +92,42 @@
             </form>
         </div>
     </div>
+
+    <script>
+function convertNameToEmail(name) {
+    // Удаляем лишние пробелы и приводим к нижнему регистру
+    let cleanedName = name.trim().toLowerCase();
+
+    // Заменяем пробелы на точки и удаляем лишние символы
+    let emailLocalPart = cleanedName
+        .replace(/\s+/g, '.')  // пробелы на точки
+        .replace(/[^a-zа-яё0-9.]/g, '') // удаляем все кроме букв, цифр и точек
+        .replace(/\.+/g, '.')  // убираем множественные точки
+        .replace(/^\.|\.$/g, ''); // убираем точки в начале и конце
+
+    return emailLocalPart + '@sbproject.ru';
+    }
+function updateEmailPreview() {
+    const usernameInput = document.getElementById('name');
+    const emailPreview = document.getElementById('emailPreview');
+
+    if (usernameInput.value.trim() !== '') {
+        const email = convertNameToEmail(usernameInput.value);
+        emailPreview.textContent = email;
+        emailPreview.classList.remove('text-muted');
+        emailPreview.classList.add('text-primary');
+    } else {
+        emailPreview.textContent = 'введите ФИО для предпросмотра';
+        emailPreview.classList.remove('text-primary');
+        emailPreview.classList.add('text-muted');
+    }
+}
+
+// Инициализация при загрузке страницы
+document.addEventListener('DOMContentLoaded', function() {
+    updateEmailPreview();
+});
+    </script>
 </div>
 </body>
 </html>

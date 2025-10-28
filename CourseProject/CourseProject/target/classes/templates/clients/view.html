@@ -2,6 +2,14 @@
 <html xmlns:th="http://www.thymeleaf.org"
       xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
       layout:decorate="~{layout}">
+        <!-- Bootstrap CSS -->
+        <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+
+        <!-- Font Awesome -->
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
+
+        <!-- Bootstrap JS -->
+        <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
 <head>
     <title>Просмотр клиента</title>
 </head>
@@ -118,50 +126,6 @@
             </div>
         </div>
     </div>
-
-    <!-- Дополнительные услуги и информация -->
-    <div class="row">
-        <div class="col-md-6">
-            <div class="card mb-4">
-                <div class="card-header bg-info text-white">
-                    <h5 class="mb-0"><i class="fas fa-concierge-bell me-2"></i>Дополнительные услуги</h5>
-                </div>
-                <div class="card-body">
-                    <div th:if="${client.smsNotification}" class="alert alert-success py-2">
-                        <i class="fas fa-check-circle me-2"></i>SMS-информирование
-                        <div class="mt-1 small">
-                            Стоимость: <strong id="smsCostBadge" th:text="${#numbers.formatDecimal(client.smsNotificationCost ?: 200, 0, 'COMMA', 2, 'POINT') + ' ₽'}"></strong>
-                        </div>
-                    </div>
-                    <div th:unless="${client.smsNotification}" class="alert alert-secondary py-2">
-                        <i class="fas fa-times-circle me-2"></i>SMS-информирование
-                    </div>
-
-                    <div th:if="${client.phoneNotification}" class="alert alert-success py-2">
-                        <i class="fas fa-check-circle me-2"></i>Телефонное оповещение
-                        <div class="mt-1 small">
-                            Стоимость: <strong id="phoneCostBadge" th:text="${#numbers.formatDecimal(client.phoneNotificationCost ?: 250, 0, 'COMMA', 2, 'POINT') + ' ₽'}"></strong>
-                        </div>
-                    </div>
-                    <div th:unless="${client.phoneNotification}" class="alert alert-secondary py-2">
-                        <i class="fas fa-times-circle me-2"></i>Телефонное оповещение
-                    </div>
-
-                    <div th:if="${client.deliveryService}" class="alert alert-success py-2">
-                        <i class="fas fa-check-circle me-2"></i>Доставка документов
-                        <div class="mt-1 small">
-                            Город: <strong th:text="${client.deliveryCity}"></strong>
-                        </div>
-                        <div class="mt-1 small">
-                            Стоимость: <strong id="deliveryCostBadge" th:text="${#numbers.formatDecimal(client.deliveryCost ?: 0, 0, 'COMMA', 2, 'POINT') + ' ₽'}"></strong>
-                        </div>
-                    </div>
-                    <div th:unless="${client.deliveryService}" class="alert alert-secondary py-2">
-                        <i class="fas fa-times-circle me-2"></i>Доставка документов
-                    </div>
-                </div>
-            </div>
-        </div>
 
         <div class="col-md-6">
             <div class="card mb-4">

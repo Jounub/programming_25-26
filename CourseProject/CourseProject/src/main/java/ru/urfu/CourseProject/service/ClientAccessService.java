@@ -56,8 +56,4 @@ public class ClientAccessService {
                 .map(GrantedAuthority::getAuthority)
                 .anyMatch(role::equals);
     }
-
-    public String getCurrentUsername() {
-        return SecurityContextHolder.getContext().getAuthentication().getName();
-    }
 }

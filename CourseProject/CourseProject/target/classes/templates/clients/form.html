@@ -1,5 +1,13 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org" lang="ru">
+<!-- Bootstrap CSS -->
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+
+<!-- Font Awesome -->
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
+
+<!-- Bootstrap JS -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
 <head>
     <meta charset="UTF-8">
     <title th:text="${isEdit ? 'Редактирование клиента' : 'Создание клиента'}"></title>
@@ -28,6 +36,7 @@
         input[type=text],
         input[type=email],
         input[type=date],
+        input[type=tel],
         select,
         textarea {
             width: 100%;
@@ -84,6 +93,16 @@
             margin-bottom: 15px;
             color: #495057;
         }
+        .error-message {
+            color: #dc3545;
+            font-size: 12px;
+            margin-top: -10px;
+            margin-bottom: 10px;
+            display: none;
+        }
+        .form-group {
+            margin-bottom: 15px;
+        }
     </style>
 </head>
 <body>
@@ -91,28 +110,43 @@
     <h2 th:text="${isEdit ? 'Редактирование клиента' : 'Создание нового клиента'}"></h2>
 
     <!-- Исправленная строка с form action -->
-    <form th:action="${isEdit} ? @{/clients/update/{id}(id=${client.id})} : @{/clients/create}" method="post" th:object="${client}">
+    <form th:action="${isEdit} ? @{/clients/update/{id}(id=${client.id})} : @{/clients/create}" method="post" th:object="${client}" id="clientForm">
         <!-- Основные данные клиента -->
-        <label for="name">Имя:</label>
-        <input type="text" id="name" th:field="*{name}" placeholder="Введите имя" required>
+        <div class="form-group">
+            <label for="name">Имя:</label>
+            <input type="text" id="name" th:field="*{name}" placeholder="Введите имя" required>
+        </div>
 
-        <label for="surname">Фамилия:</label>
-        <input type="text" id="surname" th:field="*{surname}" placeholder="Введите фамилию" required>
+        <div class="form-group">
+            <label for="surname">Фамилия:</label>
+            <input type="text" id="surname" th:field="*{surname}" placeholder="Введите фамилию" required>
+        </div>
 
-        <label for="passportNumber">Номер паспорта:</label>
-        <input type="text" id="passportNumber" th:field="*{passportNumber}" placeholder="Серия и номер">
+        <div class="form-group">
+            <label for="passportNumber">Номер паспорта:</label>
+            <input type="text" id="passportNumber" th:field="*{passportNumber}" placeholder="123456789"
+                   pattern="\d{9}" title="Номер паспорта должен содержать ровно 9 цифр" maxlength="9">
+            <div class="error-message" id="passportError">Номер паспорта должен содержать ровно 9 цифр</div>
+        </div>
 
-        <label for="birthdate">Дата рождения:</label>
-        <input type="date" id="birthdate" th:field="*{birthdate}">
+        <div class="form-group">
+            <label for="birthdate">Дата рождения:</label>
+            <input type="date" id="birthdate" th:field="*{birthdate}" required>
+        </div>
 
-        <label for="email">Email:</label>
-        <input type="email" id="email" th:field="*{email}" placeholder="Введите email">
+        <div class="form-group">
+            <label for="email">Email:</label>
+            <input type="email" id="email" th:field="*{email}" placeholder="Введите email" required>
+        </div>
 
-        <label for="phone">Телефон:</label>
-        <input type="text" id="phone" th:field="*{phone}" placeholder="+7 (___) ___-__-__">
+        <div class="form-group">
+            <label for="phone">Телефон:</label>
+            <input type="tel" id="phone" th:field="*{phone}" placeholder="+7(900)0000000" pattern="\+7\(\d{3}\)\d{7}" title="Формат: +7(900)0000000">
+            <div class="error-message" id="phoneError">Введите телефон в формате +7(900)0000000</div>
+        </div>
 
         <!-- Поле статуса только для редактирования -->
-        <div th:if="${isEdit}">
+        <div th:if="${isEdit}" class="form-group">
             <label for="status">Статус клиента:</label>
             <select id="status" th:field="*{status}">
                 <option th:each="s : ${statuses}" th:value="${s}" th:text="${s}"></option>
@@ -123,17 +157,25 @@
         <div class="address-section">
             <div class="address-title">Адрес клиента</div>
 
-            <label for="city">Город:</label>
-            <input type="text" id="city" name="city" th:value="${client.address?.city}" placeholder="Введите город" required>
+            <div class="form-group">
+                <label for="city">Город:</label>
+                <input type="text" id="city" name="city" th:value="${client.address?.city}" placeholder="Введите город" required>
+            </div>
 
-            <label for="street">Улица:</label>
-            <input type="text" id="street" name="street" th:value="${client.address?.street}" placeholder="Введите улицу" required>
+            <div class="form-group">
+                <label for="street">Улица:</label>
+                <input type="text" id="street" name="street" th:value="${client.address?.street}" placeholder="Введите улицу" required>
+            </div>
 
-            <label for="building">Дом:</label>
-            <input type="text" id="building" name="building" th:value="${client.address?.building}" placeholder="Введите номер дома" required>
+            <div class="form-group">
+                <label for="building">Дом:</label>
+                <input type="text" id="building" name="building" th:value="${client.address?.building}" placeholder="Введите номер дома" required>
+            </div>
 
-            <label for="apartment">Квартира:</label>
-            <input type="text" id="apartment" name="apartment" th:value="${client.address?.apartment}" placeholder="Введите номер квартиры (необязательно)">
+            <div class="form-group">
+                <label for="apartment">Квартира:</label>
+                <input type="text" id="apartment" name="apartment" th:value="${client.address?.apartment}" placeholder="Введите номер квартиры (необязательно)">
+            </div>
         </div>
 
         <!-- Дополнительные услуги -->
@@ -144,13 +186,17 @@
         </div>
 
         <div id="deliveryCityGroup" style="display: none;">
-            <label for="deliveryCity">Город доставки:</label>
-            <input type="text" id="deliveryCity" name="deliveryCity" th:field="*{deliveryCity}" placeholder="Введите город">
-            <div class="delivery-info" id="deliveryPriceInfo">Стоимость доставки: 0₽</div>
+            <div class="form-group">
+                <label for="deliveryCity">Город доставки:</label>
+                <input type="text" id="deliveryCity" name="deliveryCity" th:field="*{deliveryCity}" placeholder="Введите город">
+                <div class="delivery-info" id="deliveryPriceInfo">Стоимость доставки: 0₽</div>
+            </div>
         </div>
 
-        <label for="notes">Примечания:</label>
-        <textarea id="notes" th:field="*{notes}" rows="3" placeholder="Дополнительная информация о клиенте"></textarea>
+        <div class="form-group">
+            <label for="notes">Примечания:</label>
+            <textarea id="notes" th:field="*{notes}" rows="3" placeholder="Дополнительная информация о клиенте"></textarea>
+        </div>
 
         <!-- Скрытые поля для стоимостей услуг -->
         <input type="hidden" id="smsCostInput" name="smsCost" th:field="*{smsNotificationCost}" th:value="${client.smsNotificationCost ?: 0}">
@@ -184,6 +230,11 @@
     const totalAmountEl = document.getElementById('totalAmount');
     const totalAmountInput = document.getElementById('totalAmountInput');
     const costBreakdownEl = document.getElementById('costBreakdown');
+    const phoneInput = document.getElementById('phone');
+    const passportInput = document.getElementById('passportNumber');
+    const passportError = document.getElementById('passportError');
+    const phoneError = document.getElementById('phoneError');
+    const clientForm = document.getElementById('clientForm');
 
     // Скрытые поля для стоимостей
     const smsCostInput = document.getElementById('smsCostInput');
@@ -194,6 +245,82 @@
     // Кэш для цен доставки
     const deliveryPriceCache = new Map();
     let currentDeliveryPrice = 0;
+
+    // Функция для маски телефона
+    function formatPhoneInput(input) {
+        // Удаляем все нецифровые символы, кроме плюса в начале
+        let value = input.value.replace(/[^\d+]/g, '');
+
+        // Если начинается не с +7, форматируем как +7
+        if (!value.startsWith('+7')) {
+            value = '+7' + value.replace(/^\+?/, '').replace(/[^\d]/g, '');
+        }
+
+        // Ограничиваем длину (код страны + код оператора + номер)
+        if (value.length > 12) {
+            value = value.substring(0, 12);
+        }
+
+        // Форматируем в +7(XXX)XXXXXXX
+        if (value.length > 3) {
+            value = value.replace(/^(\+7)(\d{0,3})(\d{0,7})/, function(_, prefix, code, number) {
+                let result = prefix;
+                if (code) result += '(' + code;
+                if (number) result += ')' + number;
+                return result;
+            });
+        }
+
+        input.value = value;
+    }
+
+    // Функция для валидации телефона
+    function validatePhone(input) {
+        const value = input.value;
+        const phoneRegex = /^\+7\(\d{3}\)\d{7}$/;
+
+        if (value && !phoneRegex.test(value)) {
+            input.setCustomValidity('Введите телефон в формате +7(900)0000000');
+            phoneError.style.display = 'block';
+            return false;
+        } else {
+            input.setCustomValidity('');
+            phoneError.style.display = 'none';
+            return true;
+        }
+    }
+
+    // Функция для валидации паспорта
+    function validatePassport(input) {
+        const value = input.value.replace(/\s/g, ''); // Удаляем пробелы
+        const passportRegex = /^\d{9}$/;
+
+        if (value && !passportRegex.test(value)) {
+            input.setCustomValidity('Номер паспорта должен содержать ровно 9 цифр');
+            passportError.style.display = 'block';
+            return false;
+        } else {
+            input.setCustomValidity('');
+            passportError.style.display = 'none';
+            return true;
+        }
+    }
+
+    // Функция для форматирования паспорта (только цифры)
+    function formatPassportInput(input) {
+        // Удаляем все нецифровые символы
+        let value = input.value.replace(/\D/g, '');
+
+        // Ограничиваем длину 9 символами
+        if (value.length > 9) {
+            value = value.substring(0, 9);
+        }
+
+        input.value = value;
+
+        // Валидируем после форматирования
+        validatePassport(input);
+    }
 
     // Функция для получения цены доставки с сервера
     async function getDeliveryPrice(city) {
@@ -298,6 +425,38 @@
     smsCheckbox.addEventListener('change', recalcTotal);
     phoneCheckbox.addEventListener('change', recalcTotal);
 
+    // Обработчики для телефона
+    phoneInput.addEventListener('input', function() {
+        formatPhoneInput(this);
+        validatePhone(this);
+    });
+
+    phoneInput.addEventListener('blur', function() {
+        validatePhone(this);
+    });
+
+    // Обработчики для паспорта
+    passportInput.addEventListener('input', function() {
+        formatPassportInput(this);
+    });
+
+    passportInput.addEventListener('blur', function() {
+        validatePassport(this);
+    });
+
+    // Валидация формы при отправке
+    clientForm.addEventListener('submit', function(event) {
+        const isPhoneValid = validatePhone(phoneInput);
+        const isPassportValid = validatePassport(passportInput);
+
+        if (!isPhoneValid || !isPassportValid) {
+            event.preventDefault();
+            // Показываем все ошибки
+            validatePhone(phoneInput);
+            validatePassport(passportInput);
+        }
+    });
+
     // Функция для задержки запросов (debounce)
     function debounce(func, wait) {
         let timeout;
@@ -317,6 +476,17 @@
         if (deliveryCheckbox.checked) {
             deliveryCityGroup.style.display = 'block';
             updateDeliveryPrice();
+        }
+
+        // Форматируем начальные значения, если они есть
+        if (phoneInput.value) {
+            formatPhoneInput(phoneInput);
+            validatePhone(phoneInput);
+        }
+
+        if (passportInput.value) {
+            formatPassportInput(passportInput);
+            validatePassport(passportInput);
         }
 
         // Начальный расчёт

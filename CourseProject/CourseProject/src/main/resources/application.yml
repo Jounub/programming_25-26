@@ -10,7 +10,7 @@ spring:
     database-platform: org.hibernate.dialect.H2Dialect
     hibernate:
       ddl-auto: update
-    show-sql: true
+    show-sql: false
     properties:
       hibernate:
         format_sql: true
@@ -23,3 +23,10 @@ management:
         include: health, info, metrics
     health:
       show-details: always
+logging:
+  file:
+    name: application.log
+  level:
+    root: info
+  pattern:
+    file: "%d{yyyy-MM-dd HH:mm:ss} - %msg%n"

@@ -10,19 +10,8 @@ import ru.urfu.CourseProject.model.ClientStatus;
 import java.util.List;
 @Repository
 public interface ClientRepository extends JpaRepository<Client, Long> {
-    //List<Client> findBySurnameContainingIgnoreCase(String surname);
-
-    //List<Client> findByPassportNumber(String passportNumber);
-
-//    @Query("SELECT c FROM Client c WHERE :username IS NULL OR c.createdBy = :username")
-//    List<Client> findByCreatedBy(@Param("email") String email);
     List<Client> findByCreatedBy(String createdBy);
 
-
-    // Для поиска по статусу
-    //List<Client> findByStatus(ClientStatus status);
-
-    // Общая статистика по статусам (для ADMIN)
-    //@Query("SELECT c.status, COUNT(c) FROM Client c GROUP BY c.status")
-    //List<Object[]> getStatusCountOverall();
+    // Найти клиентов, у которых статус не в указанном списке
+    List<Client> findByStatusNotIn(List<ClientStatus> statuses);
 }

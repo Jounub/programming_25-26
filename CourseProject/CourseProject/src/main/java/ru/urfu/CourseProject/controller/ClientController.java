@@ -1,7 +1,9 @@
 package ru.urfu.CourseProject.controller;
 
-import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
@@ -17,7 +19,9 @@ import ru.urfu.CourseProject.service.ClientService;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
+@Slf4j
 @Controller
 @RequestMapping("/clients")
 @RequiredArgsConstructor
@@ -25,6 +29,7 @@ public class ClientController {
     private final ClientService clientService;
     private final ClientAccessService clientAccessService;
     private final DeliveryPriceRepository deliveryPriceRepository;
+    private static final Logger logger = LoggerFactory.getLogger(ClientController.class);
 
     // Список клиентов (с учетом прав доступа)
     @GetMapping("/list")
@@ -125,10 +130,18 @@ public class ClientController {
             client.setSmsNotificationCost(smsCost);
             client.setPhoneNotificationCost(phoneCost);
             clientService.createClient(client);
+            logger.info("Client " +
+                    client.getName() + " " +
+                    client.getSurname() +
+                    " was created by " +
+                    client.getCreatedBy() +
+                    " at " +
+                    client.getCreatedDate());
             redirectAttributes.addFlashAttribute("success", "Клиент успешно создан");
         } catch (Exception e) {
             redirectAttributes.addFlashAttribute("error", "Ошибка при создании клиента: " + e.getMessage());
         }
+
         return "redirect:/clients/list";
     }
 
@@ -213,6 +226,14 @@ public class ClientController {
 
             clientService.updateClient(id, client);
             redirectAttributes.addFlashAttribute("success", "Клиент успешно обновлен");
+            Optional<Client> updatedClient = clientService.findById(client.getId());
+            updatedClient.ifPresent(clientInfo -> logger.info("Client " +
+                    clientInfo.getName() + " " +
+                    clientInfo.getSurname() +
+                    " was updated by " +
+                    clientInfo.getUpdatedBy() +
+                    " at " +
+                    clientInfo.getLastUpdated()));
         } catch (Exception e) {
             redirectAttributes.addFlashAttribute("error", "Ошибка при обновлении клиента: " + e.getMessage());
         }
