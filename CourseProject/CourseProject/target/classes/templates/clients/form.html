@@ -149,7 +149,11 @@
         <div th:if="${isEdit}" class="form-group">
             <label for="status">Статус клиента:</label>
             <select id="status" th:field="*{status}">
-                <option th:each="s : ${statuses}" th:value="${s}" th:text="${s}"></option>
+                <option th:each="status : ${statuses}"
+                        th:value="${status}"
+                        th:text="${status.displayName}"
+                        th:selected="${client.status == status}">
+                </option>
             </select>
         </div>
 

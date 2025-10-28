@@ -25,11 +25,11 @@ public class DeliveryController {
                 response.put("price", deliveryPrice.getDeliveryCost());
                 response.put("city", deliveryPrice.getCity());
             } else {
-                response.put("price", 400); // цена по умолчанию
+                response.put("price", 5000); // цена по умолчанию
                 response.put("message", "Город не найден, применена цена по умолчанию");
             }
         } catch (Exception e) {
-            response.put("price", 400);
+            response.put("price", 5000);
             response.put("message", "Ошибка при получении цены");
         }
 

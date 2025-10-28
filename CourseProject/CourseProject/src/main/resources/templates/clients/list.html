@@ -33,10 +33,6 @@
                     <i class="fas fa-plus"></i> Новый клиент
                 </a>
             </th:block>
-            <a th:href="@{/clients/list}" class="btn btn-outline-secondary"
-               th:if="${(isMyClients != null and isMyClients) or #authorization.expression('hasRole(''USER'')') or #authorization.expression('hasRole(''SUPERVISOR'')') or #authorization.expression('hasRole(''ADMIN'')')}">
-                Все клиенты
-            </a>
         </div>
     </div>
 

@@ -1,5 +1,8 @@
 package ru.urfu.CourseProject.model;
 
+import lombok.Getter;
+
+@Getter
 public enum ClientStatus {
     ACCEPTED_FOR_PROCESSING("Принято в обработку"),
     UNDER_REVIEW("На рассмотрении"),
@@ -11,9 +14,5 @@ public enum ClientStatus {
 
     ClientStatus(String displayName) {
         this.displayName = displayName;
-    }
-
-    public String getDisplayName() {
-        return displayName;
     }
 }
