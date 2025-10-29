@@ -28,7 +28,6 @@ public class WebSecurityConfig {
                         .requestMatchers("/clients/new", "/clients/create").hasAnyRole("USER","ADMIN", "SUPERVISOR")
                         .requestMatchers("/clients/edit/**", "/clients/update/**", "/clients/delete/**", "/status-management/**")
                             .hasAnyRole("SUPERVISOR", "ADMIN")
-                        .requestMatchers("/admin/**", "/clients/**", "/users/roles").hasRole("ADMIN")
                         .requestMatchers("/admin/**", "/users/**").hasRole("ADMIN")
                         .anyRequest().authenticated()
                 )
